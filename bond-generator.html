@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Treasury Bond Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Rye&display=swap" rel="stylesheet"/>
+  <style>
+    .rye-regular { 
+      font-family: "Rye", serif; 
+      font-weight: 400; 
+      font-style: normal; 
+    }
+
+    body {
+      margin: 0; padding: 0;
+      height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      background-image: url('blur.jpg');
+      background-size: cover;
+      background-position: center;
+      filter: blur(0);
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image: url('blur.jpg');
+      background-size: cover;
+      background-position: center;
+      filter: blur(8px);
+      z-index: -1;
+    }
+
+    .bond-image {
+      width: 400px;
+      height: 200px;
+      object-fit: contain;
+      margin-bottom: 20px;
+      border-radius: 3px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .container {
+      width: 80%; max-width: 600px;
+      background: linear-gradient(135deg, #0056c7, #5e91ff);
+      padding: 30px; border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      display: flex; flex-direction: column; align-items: center;
+      position: relative;
+    }
+
+    .input-field {
+      width: 80%;
+      background-color: #0f1729;
+      border: none; padding: 15px;
+      border-radius: 10px; margin-bottom: 10px;
+      color: white; font-size: 18px;
+    }
+    .input-field::placeholder { color: #8d8d8d; }
+
+    .error-message {
+      color: #000;
+      font-size: 14px;
+      margin-bottom: 10px;
+      display: none;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      width: 80%;
+      margin-bottom: 10px;
+    }
+
+    .number-button {
+      background-color: #0f1729;
+      border: none; width: 22%; padding: 15px 0;
+      border-radius: 10px; cursor: pointer;
+      font-family: 'Rye', serif; font-size: 24px;
+      color: #FB7B6A;
+      transition: background-color .3s, box-shadow .3s;
+      text-align: center;
+      outline: none;
+    }
+    .number-button.active {
+      background-color: #001f44;
+      color: #fff;
+      box-shadow: 0 0 15px rgba(0,255,255,0.7);
+    }
+    .number-button:focus {
+      outline: 2px solid #FB7B6A;
+    }
+    .number-button:hover {
+      box-shadow: 0 0 15px rgba(255,255,255,0.8);
+    }
+
+    .generate-button {
+      background: linear-gradient(to right, #2989d8, #1e5799);
+      border: none; width: 60%; padding: 12px 0;
+      border-radius: 10px; cursor: pointer;
+      font-family: 'Rye', serif; font-size: 28px;
+      color: #ff3333; transition: box-shadow .3s;
+      text-align: center;
+      outline: none;
+    }
+    .generate-button:hover {
+      box-shadow: 0 0 15px rgba(255,255,255,0.8);
+    }
+    .generate-button:focus {
+      box-shadow: 0 0 15px rgba(255,255,255,0.8);
+      outline: 2px solid #ff3333;
+    }
+
+    .star-image {
+      margin-top: 20px;
+      width: 100px;
+      height: auto;
+    }
+
+    .modal {
+      display: none; position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.8); z-index:100;
+      justify-content: center; align-items: center;
+    }
+    .modal-content {
+      background: #fff; padding: 30px;
+      border-radius: 10px; width: 80%; max-width:500px;
+      text-align: center;
+    }
+    .progress-container {
+      width: 100%; background: #ddd;
+      border-radius:5px; margin:20px 0;
+    }
+    .progress-bar {
+      height:30px; width:0%; border-radius:5px;
+      transition: width .1s; background: #4CAF50;
+    }
+    .progress-text { font-size:18px; font-weight:bold; }
+
+    .green-glow {
+      position:absolute; width:200px; height:200px;
+      background: radial-gradient(circle, rgba(68,255,0,0.4) 0%, rgba(68,255,0,0) 70%);
+      border-radius:50%; pointer-events:none; z-index:-1;
+    }
+    .left-glow { left:-50px; bottom:-50px; }
+    .right-glow { right:-50px; bottom:-50px; }
+  </style>
+</head>
+<body>
+  <img src="TreasureBond.webp" alt="Treasury Bond" class="bond-image">
+
+  <div class="container">
+    <div class="green-glow left-glow"></div>
+    <div class="green-glow right-glow"></div>
+
+    <input type="text" class="input-field" placeholder="Username/ID" id="usernameInput">
+    <div class="error-message" id="usernameError">Please enter a username</div>
+    
+    <div class="button-group">
+      <button class="number-button rye-regular" tabindex="0">1</button>
+      <button class="number-button rye-regular" tabindex="0">10</button>
+      <button class="number-button rye-regular" tabindex="0">100</button>
+      <button class="number-button rye-regular" tabindex="0">1000</button>
+    </div>
+    <div class="error-message" id="amountError">Please select an amount</div>
+
+    <button class="generate-button rye-regular" id="generateButton">generate</button>
+    
+    <img src="20StarPoints.webp" alt="20 Star Points" class="star-image">
+  </div>
+
+  <div class="modal" id="loadingModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-content">
+      <h2 id="modalTitle">Generating Your Treasure Bond</h2>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <p class="progress-text"><span id="progressPercent">0</span>% complete</p>
+    </div>
+  </div>
+
+  <script>
+    // selection logic + keyboard handling
+    const buttons = document.querySelectorAll('.number-button');
+    let selectedAmount = null;
+    const amountError = document.getElementById('amountError');
+
+    buttons.forEach(btn => {
+      const select = () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedAmount = btn.textContent;
+        amountError.style.display = 'none';
+      };
+      btn.addEventListener('click', select);
+      btn.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          select();
+        }
+      });
+    });
+
+    // generate logic
+    document.getElementById('generateButton').addEventListener('click', () => {
+      const username = document.getElementById('usernameInput').value.trim();
+      const usernameError = document.getElementById('usernameError');
+      usernameError.style.display = 'none';
+      amountError.style.display = 'none';
+
+      if (!username) {
+        usernameError.style.display = 'block';
+        return;
+      }
+      if (!selectedAmount) {
+        amountError.style.display = 'block';
+        return;
+      }
+
+      // update modal title
+      document.getElementById('modalTitle').textContent =
+        `Generating Your ${selectedAmount} Treasure Bond`;
+
+      // show modal + progress
+      const modal = document.getElementById('loadingModal');
+      const progressBar = document.getElementById('progressBar');
+      const progressPercent = document.getElementById('progressPercent');
+      modal.style.display = 'flex';
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress++;
+        progressBar.style.width = progress + '%';
+        progressPercent.textContent = progress;
+        if (progress >= 100) {
+          clearInterval(interval);
+          window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+        }
+      }, 50);
+    });
+  </script>
+</body>
+</html>
